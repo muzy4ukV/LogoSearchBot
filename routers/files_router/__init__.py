@@ -5,7 +5,6 @@ from .start import start_message
 router = Router()
 router.message.filter(F.chat.type == "private")
 
-
 router.message.register(start_message, CommandStart())
 
 
