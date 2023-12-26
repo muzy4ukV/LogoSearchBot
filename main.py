@@ -50,7 +50,8 @@ async def main():
     )
     dp.startup.register(on_startup)
 
-    dp.update.middleware(UpdateUserMiddleware())
+    dp.message.middleware(UpdateUserMiddleware())
+    dp.callback_query.middleware(UpdateUserMiddleware())
 
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

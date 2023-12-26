@@ -9,8 +9,9 @@ from .photo import get_photo, get_file_photo
 from .result import return_result, warning_send_media
 from .canceling import cmd_cancel, cmd_cancel_no_state, cmd_cancel_sending_media
 
+import os
+
 default_router = Router()
-default_router.message.filter(F.chat.type == "private")
 
 default_router.message.register(start_message, CommandStart())
 default_router.message.register(get_photo, MediaProcessing.sending_media, F.photo)

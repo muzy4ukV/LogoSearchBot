@@ -2,18 +2,23 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
 import markdown as md
-from states import MediaProcessing
 import os
 
+from states import MediaProcessing
+from database import models as dbm
 
-async def start_message(message: Message, state: FSMContext):
-    # clearing previous media
-    await state.clear()
-    directory_path = f"users/{message.from_user.id}"
-    for file_name in os.listdir(directory_path):
-        file_path = os.path.join(directory_path, file_name)
+
+def clear_folder(path: str):
+    for file_name in os.listdir(path):
+        file_path = os.path.join(path, file_name)
         if os.path.isfile(file_path):
             os.remove(file_path)
+
+
+async def start_message(message: Message, state: FSMContext, user: dbm.User):
+    # clearing previous media
+    await state.clear()
+    clear_folder(user.data_folder)
     # setting new state
     await state.set_state(MediaProcessing.sending_media)
     await message.answer(
