@@ -32,7 +32,7 @@ async def get_file_photo(message: Message, bot: Bot, user: dbm.User):
         await message.answer(
             text=md.text(
                 "You sent incorrect media type ❗️",
-                md.text("Send media only in", md.bold(".jpg .png .mp4"), "format"),
+                md.text("Send media only in", md.bold(".jpg"), "format"),
                 sep="\n"
             )
         )
