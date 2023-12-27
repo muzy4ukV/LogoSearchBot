@@ -35,7 +35,7 @@ async def change_sens(message: Message, state: FSMContext, user: dbm.User):
 async def sens_chosen(message: Message, state: FSMContext, user: dbm.User):
     try:
         new_sens = float(message.text.lower().strip())
-        if new_sens > 1 or new_sens < 0:
+        if new_sens > 1 or new_sens < 0.05:
             await message.answer("The number is out of range\. Please specify number from 0\.05 to 1")
         elif new_sens not in [i / 20 for i in range(21)]:
             await message.answer("The number is not divisible by 0\.05\. Enter a number that will be a multiple of 0\.05")
