@@ -14,20 +14,8 @@ from middlewares.update_user import UpdateUserMiddleware
 async def on_startup(bot: Bot):
     default_commands = [
         BotCommand(
-            command='start',
-            description='Send your media'
-        ),
-        BotCommand(
-            command='run',
-            description='Start detecting model'
-        ),
-        BotCommand(
-            command='last_result',
-            description='Get last detection result'
-        ),
-        BotCommand(
-            command='change_sens',
-            description='Change a sensetivity of model'
+            command='menu',
+            description='Go to main menu'
         ),
         BotCommand(
             command='cancel',

@@ -14,4 +14,5 @@ class User(Base):
     sens_level: Mapped[float] = mapped_column(default=0.5)
     data_folder: Mapped[str]
     result_folder: Mapped[str]
+    show_labels: Mapped[bool] = mapped_column(default=True)
 

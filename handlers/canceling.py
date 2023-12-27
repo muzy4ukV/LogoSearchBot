@@ -1,9 +1,11 @@
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
 import markdown as md
 
+from .start import get_menu
 
-async def cmd_cancel_no_state(message: Message, state: FSMContext):
+
+async def cancel_no_state(message: Message, state: FSMContext):
     await state.set_data({})
     await message.answer(
         text="There nothing to cancel",
@@ -15,29 +17,43 @@ async def cmd_cancel(message: Message, state: FSMContext):
     await message.answer(
         text="Command cancelled",
     )
+    await get_menu(message)
 
 
-async def cmd_cancel_sending_media(message: Message, state: FSMContext):
+async def cancel_sending_media(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text=md.text(
             "Sending media cancelled ❌",
-            md.text("Run", md.bold("/start"), "command to try again"),
-            sep="\n"
-        ),
+        )
     )
+    await get_menu(message)
 
 
 async def cancel_sens_chosen(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
         text=md.text(
-            "Changing sensitivity cancelled ❌",
-            md.text("Run", md.bold("/start"), "command to make new request"),
-            sep="\n"
-        ),
+            "Changing sensitivity cancelled ❌"
+        )
     )
+    await get_menu(message)
 
 
 async def no_reply(message: Message):
-    await message.answer("Sorry, I do not understand you")
+    await message.reply("I don't know this command 🤷‍♂️")
+
+
+async def warning(message: Message):
+    await message.reply(
+        text="To run any command you need to stop sending media\n"
+             "To do this send /cancel command"
+    )
+
+
+async def warning_cl(callback: CallbackQuery):
+    await callback.answer(
+        text="To run any command you need to stop sending media\n"
+             "To do this send /cancel command",
+        show_alert=True
+    )

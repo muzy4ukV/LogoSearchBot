@@ -4,8 +4,8 @@ from aiogram.fsm.context import FSMContext
 import markdown as md
 import os
 
-from states import MediaProcessing
 from database import models as dbm
+from keyboards.keyboards import get_main_keyboard
 
 
 def clear_folder(path: str):
@@ -16,15 +16,19 @@ def clear_folder(path: str):
 
 
 async def start_message(message: Message, state: FSMContext, user: dbm.User):
-    # clearing previous media
-    await state.clear()
-    clear_folder(user.data_folder)
-    # setting new state
-    await state.set_state(MediaProcessing.sending_media)
     await message.answer(
         text=md.text(
             md.text("I'm glad you decided to use me 😊"),
-            md.text("Now, send from", md.bold("1 to 5"), "photos in this chat and write /run command"),
+            md.text("Send /menu command to detect logo"),
             sep='\n'
         )
     )
+
+
+async def get_menu(message: Message):
+    await message.answer(
+        text="This is main menu\. Choose what you want to do:",
+        reply_markup=get_main_keyboard()
+    )
+
+
