@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
+    WAIT_TIME_SETTINGS: int
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 

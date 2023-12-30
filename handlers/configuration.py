@@ -52,7 +52,7 @@ async def sens_chosen(message: Message, state: FSMContext, user: dbm.User):
             await message.answer("The number is not divisible by 0\.05\. Enter a number that will be a multiple of 0\.05")
         else:
             user.update(sens_level=new_sens)
-            await message.answer(md.bold("The sensitive level was changed\!"))
+            await message.answer(md.bold("The sensitive level was changed!"))
             await state.clear()
             await get_menu(message)
     except ValueError as e:

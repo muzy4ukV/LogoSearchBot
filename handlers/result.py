@@ -1,9 +1,7 @@
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.utils.media_group import MediaGroupBuilder
 
 
-from states import MediaProcessing
 from yolov5 import detect
 import markdown as md
 from database import models as dbm

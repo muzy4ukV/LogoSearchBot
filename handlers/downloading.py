@@ -1,6 +1,8 @@
+from typing import List
+
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, Downloadable
 import markdown as md
 import os
 import asyncio
@@ -24,7 +26,8 @@ async def start_downloading(callback: CallbackQuery, state: FSMContext, user: db
         text=md.text(
             md.text("Send from", md.bold("1 to 5"), "media files in this chat"),
             md.text("Note\! ⚠️ Media must be only in", md.bold(".jpg .png .mp4 .mov"), "format"),
-            md.text("You can cancel this but everything will be aborted"),
+            md.text("Your video must be less than 15 sec long"),
+            md.text("You can cancel this typing /cancel"),
             sep='\n'
         ),
         reply_markup=ReplyKeyboardRemove()
@@ -46,40 +49,28 @@ async def check_max_num(path: str, message: Message):
         return False
 
 
-async def get_photo(message: Message, bot: Bot, user: dbm.User):
+async def get_photo(message: Message, bot: Bot, user: dbm.User, show_cancel: bool = True):
     if not await check_max_num(user.data_folder, message):
         await download_media(
-            message,
             bot,
             message.photo[-1],
-            f"{user.data_folder}/{message.photo[-1].file_id}.jpg",
-            user
+            f"{user.data_folder}/{message.photo[-1].file_id}.jpg"
         )
+        if show_cancel:
+            await show_stop_message(message, user)
 
 
-async def download_media(message: Message, bot: Bot, object, destination: str, user: dbm.User):
-    await bot.download(
-        object,
-        destination=destination
-    )
-    num_of_media = len(os.listdir(user.data_folder))
-    await message.answer(
-        text=md.text("Downloaded", md.bold(f"{num_of_media} from 5"), "photos"),
-        reply_markup=get_stop_keyboard()
-    )
-
-
-async def get_document(message: Message, bot: Bot, user: dbm.User):
+async def get_document(message: Message, bot: Bot, user: dbm.User, show_cancel: bool = True):
     if not await check_max_num(user.data_folder, message):
         file_type = message.document.file_name.split('.')[1].lower()
         if file_type in ('jpg', 'png', 'mp4', 'mov'):
             await download_media(
-                message,
                 bot,
                 message.document,
-                f"{user.data_folder}/{message.document.file_id}.{file_type}",
-                user
+                f"{user.data_folder}/{message.document.file_id}.{file_type}"
             )
+            if show_cancel:
+                await show_stop_message(message, user)
         else:
             await message.answer(
                 text=md.text(
@@ -90,21 +81,52 @@ async def get_document(message: Message, bot: Bot, user: dbm.User):
             )
 
 
-async def get_video(message: Message, bot: Bot, user: dbm.User):
+async def get_video(message: Message, bot: Bot, user: dbm.User, show_cancel: bool = True):
     if not await check_max_num(user.data_folder, message):
         if message.video.duration > 15:
             await message.answer(
-                text="Video is too long"
+                text="Video is too long\! Your video must be less than 15 sec long"
             )
+            if show_cancel:
+                await show_stop_message(message, user)
         else:
             file_type = message.video.file_name.split('.')[1].lower()
             await download_media(
-                message,
                 bot,
                 message.video,
                 f"{user.data_folder}/{message.video.file_id}.{file_type}",
-                user
             )
+
+
+async def get_media_group(message: Message, bot: Bot, user: dbm.User, context: List[Message]):
+    if context:
+        for album_item in context:
+            if album_item.photo:
+                # Handle photo
+                await get_photo(album_item, bot, user, show_cancel=False)
+            elif album_item.document:
+                # Handle document
+                await get_document(album_item, bot, user, show_cancel=False)
+            elif album_item.video:
+                # Handle vodeo
+                await get_video(album_item, bot, user, show_cancel=False)
+        await show_stop_message(message, user)
+    context.clear()
+
+
+async def download_media(bot: Bot, tg_object: Downloadable, destination: str):
+    await bot.download(
+        tg_object,
+        destination=destination
+    )
+
+
+async def show_stop_message(message: Message, user: dbm.User):
+    num_of_media = len(os.listdir(user.data_folder))
+    await message.answer(
+        text=md.text("Downloaded", md.bold(f"{num_of_media} from 5"), "photos"),
+        reply_markup=get_stop_keyboard()
+    )
 
 
 async def stop_downloading(callback: CallbackQuery, state: FSMContext):

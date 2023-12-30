@@ -5,7 +5,7 @@ from aiogram.fsm.state import default_state
 from states import MediaProcessing, ChangeSens
 
 from .start import start_message, get_menu
-from .downloading import get_photo, get_video, get_document, start_downloading, stop_downloading
+from .downloading import get_photo, get_video, get_document, start_downloading, stop_downloading, get_media_group
 from .result import run_model
 from .canceling import (cmd_cancel, cancel_no_state, cancel_sending_media,
                         cancel_sens_chosen, no_reply, warning, warning_cl)
@@ -13,8 +13,12 @@ from .configuration import (sens_chosen, warning_sens, start_configuration, star
                             show_labels_info, change_labels, warning_sens_cl)
 
 from callbacks_data import ShowLabelData
+from middlewares.albums_collector import AlbumsMiddleware
+from settings import settings
 
 default_router = Router()
+
+default_router.message.outer_middleware(AlbumsMiddleware(wait_time_seconds=settings.WAIT_TIME_SETTINGS))
 
 default_router.message.register(start_message, default_state, CommandStart())
 default_router.message.register(get_menu, default_state, Command("menu"))
@@ -22,6 +26,7 @@ default_router.message.register(get_menu, default_state, Command("menu"))
 default_router.callback_query.register(start_downloading, default_state, F.data == "download")
 default_router.callback_query.register(stop_downloading, MediaProcessing.sending_media, F.data == "stop")
 
+default_router.message.register(get_media_group, MediaProcessing.sending_media, F.media_group_id)
 default_router.message.register(get_photo, MediaProcessing.sending_media, F.photo)
 default_router.message.register(get_video, MediaProcessing.sending_media, F.video)
 default_router.message.register(get_document, MediaProcessing.sending_media, F.document)
