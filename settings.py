@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_NAME: str
     WAIT_TIME_SETTINGS: int
+    NUM_OF_REQUESTS_TO_HIDE_MSG: int
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 

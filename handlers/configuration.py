@@ -62,9 +62,15 @@ async def sens_chosen(message: Message, state: FSMContext, user: dbm.User):
         )
 
 
-async def show_labels_info(callback: CallbackQuery):
+async def show_labels_info(callback: CallbackQuery, user: dbm.User):
+    text = str()
+    if user.show_labels:
+        text = "Show labels ✅"
+    else:
+        text = "Hide labels ❌"
     await callback.message.edit_text(
-        text="This setting is responsible for displaying the class name and the confidence level on the frame",
+        text=f"This setting is responsible for displaying the class name and the confidence level on the frame\n"
+             f"Current state \- {text}",
         reply_markup=get_show_labels_keyboard()
     )
     await callback.answer()
@@ -72,7 +78,12 @@ async def show_labels_info(callback: CallbackQuery):
 
 async def change_labels(callback: CallbackQuery, callback_data: ShowLabelData, user: dbm.User):
     user.update(show_labels=callback_data.value)
-    await callback.answer(text=f"Showing labels was changed for {callback_data.value}")
+    text = str()
+    if callback_data.value:
+        text = "Show labels ✅"
+    else:
+        text = "Hide labels ❌"
+    await callback.answer(text=f"Showing labels was changed for: {text}")
     await callback.message.edit_text(
         text="This is main menu\. Choose what you want to do:",
         reply_markup=get_main_keyboard()

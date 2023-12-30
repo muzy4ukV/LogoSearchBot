@@ -15,17 +15,7 @@ async def cancel_no_state(message: Message, state: FSMContext):
 async def cmd_cancel(message: Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        text="Command cancelled",
-    )
-    await get_menu(message)
-
-
-async def cancel_sending_media(message: Message, state: FSMContext):
-    await state.clear()
-    await message.answer(
-        text=md.text(
-            "Sending media cancelled ❌",
-        )
+        text="Action cancelled ❌",
     )
     await get_menu(message)
 

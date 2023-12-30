@@ -15,4 +15,5 @@ class User(Base):
     data_folder: Mapped[str]
     result_folder: Mapped[str]
     show_labels: Mapped[bool] = mapped_column(default=True)
+    num_of_requests: Mapped[int] = mapped_column(default=0)
 

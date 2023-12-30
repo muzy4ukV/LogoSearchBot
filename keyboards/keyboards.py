@@ -11,7 +11,11 @@ def get_main_keyboard() -> InlineKeyboardMarkup:
         callback_data="download"
     ))
     builder.add(InlineKeyboardButton(
-        text="Run model with uploaded media 🤖",
+        text="Send last downloaded media ↩️",
+        callback_data="last"
+    ))
+    builder.add(InlineKeyboardButton(
+        text="Run model with downloaded media 🤖",
         callback_data="run"
     ))
     builder.add(InlineKeyboardButton(
@@ -51,7 +55,7 @@ def get_show_labels_keyboard() -> InlineKeyboardMarkup:
         callback_data=ShowLabelData(action="change", value=True)
     )
     builder.button(
-        text="Don't show labels ❌",
+        text="Hide labels ❌",
         callback_data=ShowLabelData(action="change", value=False)
     )
     builder.adjust(2)

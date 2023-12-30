@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
@@ -11,6 +11,8 @@ from database import models as dbm
 from states import MediaProcessing
 from keyboards.keyboards import get_stop_keyboard
 from .start import get_menu
+
+users_data: Dict[int, List[Message]] = {}
 
 
 def clear_folder(path: str):
@@ -34,7 +36,6 @@ async def start_downloading(callback: CallbackQuery, state: FSMContext, user: db
     )
     await asyncio.to_thread(clear_folder, user.data_folder)
     await state.set_state(MediaProcessing.sending_media)
-    await state.update_data(media_num=0)
     await callback.answer()
 
 
@@ -87,8 +88,6 @@ async def get_video(message: Message, bot: Bot, user: dbm.User, show_cancel: boo
             await message.answer(
                 text="Video is too long\! Your video must be less than 15 sec long"
             )
-            if show_cancel:
-                await show_stop_message(message, user)
         else:
             file_type = message.video.file_name.split('.')[1].lower()
             await download_media(
@@ -96,6 +95,8 @@ async def get_video(message: Message, bot: Bot, user: dbm.User, show_cancel: boo
                 message.video,
                 f"{user.data_folder}/{message.video.file_id}.{file_type}",
             )
+            if show_cancel:
+                await show_stop_message(message, user)
 
 
 async def get_media_group(message: Message, bot: Bot, user: dbm.User, context: List[Message]):
@@ -123,10 +124,14 @@ async def download_media(bot: Bot, tg_object: Downloadable, destination: str):
 
 async def show_stop_message(message: Message, user: dbm.User):
     num_of_media = len(os.listdir(user.data_folder))
-    await message.answer(
+    stop_message = await message.answer(
         text=md.text("Downloaded", md.bold(f"{num_of_media} from 5"), "photos"),
         reply_markup=get_stop_keyboard()
     )
+    if user.user_id in users_data:
+        users_data[user.user_id].append(stop_message)
+    else:
+        users_data[user.user_id] = [stop_message]
 
 
 async def stop_downloading(callback: CallbackQuery, state: FSMContext):
@@ -134,5 +139,18 @@ async def stop_downloading(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer(
         text="Sending photos stopped 🛑"
     )
-    await callback.message.delete()
+    for stop_message in users_data[callback.from_user.id]:
+        await stop_message.delete()
+    users_data[callback.from_user.id].clear()
     await get_menu(callback.message)
+
+
+async def cancel_downloading(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer(
+        text="Sending photos stopped 🛑"
+    )
+    for stop_message in users_data[message.from_user.id]:
+        await stop_message.delete()
+    users_data[message.from_user.id].clear()
+    await get_menu(message)

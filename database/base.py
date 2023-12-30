@@ -95,7 +95,7 @@ class Base(DeclarativeBase):
 engine = sa.create_engine(
     f'postgresql+psycopg2://{settings.DB_USER}:{settings.DB_PASSWORD.get_secret_value()}@' +
     f'{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}',
-    echo=True
+    echo=False
 )
 
 
