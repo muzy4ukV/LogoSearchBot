@@ -1,10 +1,8 @@
 from aiogram.types import Message
-from aiogram.fsm.context import FSMContext
 
 import markdown as md
 import os
 
-from database import models as dbm
 from keyboards.keyboards import get_main_keyboard
 
 
@@ -15,7 +13,7 @@ def clear_folder(path: str):
             os.remove(file_path)
 
 
-async def start_message(message: Message, state: FSMContext, user: dbm.User):
+async def start_message(message: Message):
     await message.answer(
         text=md.text(
             md.text("I'm glad you decided to use me 😊"),

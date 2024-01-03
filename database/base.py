@@ -1,12 +1,12 @@
 from contextlib import contextmanager
 
 import sqlalchemy as sa
-from sqlalchemy import func, select, text, update
+from sqlalchemy import select, text, update
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import DeclarativeBase, joinedload
 from sqlalchemy.orm.session import Session
 
-from typing import Annotated, List, Union
+from typing import Annotated
 
 from settings import settings
 
@@ -44,27 +44,15 @@ class Base(DeclarativeBase):
         return type(self).get_pk(pk_value)
 
     @classmethod
-    def get_options(cls):
-        options = []
-
-        relationships = inspect(cls).relationships
-        for relationship in relationships:
-            options.append(joinedload(relationship))
-
-        return options
-
-    @classmethod
     def get(
         cls,
         filter_statement=None,
-        limit: int=1,
+        limit: int = 1,
         order_by=None
-    ) -> Union['Base', List['Base']]:
+    ):
         statement = select(cls)
         if filter_statement is not None:
             statement = statement.where(filter_statement)
-
-        statement = statement.options(*cls.get_options()).limit(limit)
 
         if order_by:
             statement = statement.order_by(order_by)
@@ -76,8 +64,8 @@ class Base(DeclarativeBase):
             return session.scalars(statement).unique().all()
 
     @classmethod
-    def get_all(cls, filter_statement=None, order_by=None) -> List['Base']:
-        return cls.get(filter_statement, limit=None, order_by=order_by)
+    def get_all(cls, filter_statement=None, order_by=None):
+        return cls.get(filter_statement, order_by=order_by)
 
     @classmethod
     def get_pk(cls, pk_value) -> 'Base':

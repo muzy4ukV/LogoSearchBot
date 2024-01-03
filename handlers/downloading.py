@@ -109,7 +109,7 @@ async def get_media_group(message: Message, bot: Bot, user: dbm.User, context: L
                 # Handle document
                 await get_document(album_item, bot, user, show_cancel=False)
             elif album_item.video:
-                # Handle vodeo
+                # Handle video
                 await get_video(album_item, bot, user, show_cancel=False)
         await show_stop_message(message, user)
     context.clear()
@@ -150,7 +150,8 @@ async def cancel_downloading(message: Message, state: FSMContext):
     await message.answer(
         text="Sending photos stopped 🛑"
     )
-    for stop_message in users_data[message.from_user.id]:
-        await stop_message.delete()
-    users_data[message.from_user.id].clear()
+    if message.from_user.id in users_data:
+        for stop_message in users_data[message.from_user.id]:
+            await stop_message.delete()
+        users_data[message.from_user.id].clear()
     await get_menu(message)

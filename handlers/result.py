@@ -21,7 +21,7 @@ async def run_model(callback: CallbackQuery, state: FSMContext, user: dbm.User):
             show_alert=True
         )
         return
-    await state.set_state(MediaProcessing.runing_model)
+    await state.set_state(MediaProcessing.running_model)
     clear_folder(user.result_folder)
     await asyncio.to_thread(
         detect.run,
@@ -32,10 +32,11 @@ async def run_model(callback: CallbackQuery, state: FSMContext, user: dbm.User):
         classes=0,
         name='result',
         exist_ok=True,
-        hide_labels=not user.show_labels
+        hide_labels=not user.show_labels,
+        imgsz=(640, 640)
     )
     current_state = await state.get_state()
-    if current_state == MediaProcessing.runing_model:
+    if current_state == MediaProcessing.running_model:
         user.update(num_of_requests=user.num_of_requests+1)
         await send_result(callback.message, user, user.result_folder)
         await get_menu(callback.message)
@@ -106,7 +107,7 @@ async def send_result(message: Message, user: dbm.User, destination_folder: str)
                 )
     else:
         await message.answer(
-            "Smth went wrong 🤷‍♂️"
+            "Something went wrong 🤷‍♂️"
         )
 
 

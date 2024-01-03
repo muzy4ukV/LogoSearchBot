@@ -54,4 +54,3 @@ default_router.callback_query.register(change_labels, ShowLabelData.filter(F.act
 default_router.message.register(cancel_no_state, default_state, Command("cancel"))
 default_router.message.register(cmd_cancel, Command("cancel"))
 default_router.message.register(no_reply)
-

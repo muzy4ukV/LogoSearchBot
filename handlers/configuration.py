@@ -29,8 +29,7 @@ async def start_sensitivity(callback: CallbackQuery, state: FSMContext, user: db
                       "will draw more attention to objects that similar to the logo"),
             md.text("Sensitivity varies from 0\.05 to 1,", md.bold("default is 0.5")),
             md.text("\nNote that the sensitivity will change for all your following requests ⚠️"),
-            md.text(f"\nYour current sensetitvity level \-", md.bold(f"{user.sens_level}"),
-            ),
+            md.text(f"\nYour current sensitivity level \-", md.bold(f"{user.sens_level}")),
             sep='\n'
         )
     )
@@ -63,7 +62,6 @@ async def sens_chosen(message: Message, state: FSMContext, user: dbm.User):
 
 
 async def show_labels_info(callback: CallbackQuery, user: dbm.User):
-    text = str()
     if user.show_labels:
         text = "Show labels ✅"
     else:
@@ -78,7 +76,6 @@ async def show_labels_info(callback: CallbackQuery, user: dbm.User):
 
 async def change_labels(callback: CallbackQuery, callback_data: ShowLabelData, user: dbm.User):
     user.update(show_labels=callback_data.value)
-    text = str()
     if callback_data.value:
         text = "Show labels ✅"
     else:

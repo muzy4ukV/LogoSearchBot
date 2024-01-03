@@ -11,11 +11,11 @@ def get_main_keyboard() -> InlineKeyboardMarkup:
         callback_data="download"
     ))
     builder.add(InlineKeyboardButton(
-        text="Send last downloaded media ↩️",
+        text="Send last uploaded media ↩️",
         callback_data="last"
     ))
     builder.add(InlineKeyboardButton(
-        text="Run model with downloaded media 🤖",
+        text="Run model with uploaded media 🤖",
         callback_data="run"
     ))
     builder.add(InlineKeyboardButton(

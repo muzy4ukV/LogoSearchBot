@@ -15,8 +15,8 @@ def pre_language(replacement_text: str, language: str) -> str:
     return md.pre_language(value=quote(replacement_text), language=language)
 
 
-def link(replacement_text: str, link: str) -> str:
-    return md.link(value=quote(replacement_text), link=link)
+def link(replacement_text: str, link_par: str) -> str:
+    return md.link(value=quote(replacement_text), link=link_par)
 
 
 def bold(*args: Sequence[Any], sep=' ') -> str:
