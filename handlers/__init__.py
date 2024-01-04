@@ -4,6 +4,7 @@ from aiogram.fsm.state import default_state
 
 from states import MediaProcessing, ChangeSens
 
+from .delete_profile import delete_user_data
 from .start import start_message, get_menu
 from .downloading import (get_photo, get_video, get_document,
                           start_downloading, stop_downloading,
@@ -23,6 +24,7 @@ default_router.message.outer_middleware(AlbumsMiddleware(wait_time_seconds=setti
 
 default_router.message.register(start_message, default_state, CommandStart())
 default_router.message.register(get_menu, default_state, Command("menu"))
+default_router.message.register(delete_user_data, default_state, Command("delete_profile"))
 
 default_router.callback_query.register(start_downloading, default_state, F.data == "download")
 default_router.callback_query.register(stop_downloading, MediaProcessing.sending_media, F.data == "stop")

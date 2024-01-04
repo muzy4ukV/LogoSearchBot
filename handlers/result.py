@@ -2,7 +2,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.utils.media_group import MediaGroupBuilder
 
-
 from yolov5 import detect
 import markdown as md
 from database import models as dbm
@@ -26,10 +25,10 @@ async def run_model(callback: CallbackQuery, state: FSMContext, user: dbm.User):
     await asyncio.to_thread(
         detect.run,
         weights="weights/full_dataset.pt",
+        data="yolov5/datasets/custom_logo_dataset/data.yaml",
         source=user.data_folder,
         conf_thres=user.sens_level,
-        project=f"users/{user.user_id}",
-        classes=0,
+        project=f"users/{user.hash_id}",
         name='result',
         exist_ok=True,
         hide_labels=not user.show_labels,
@@ -37,7 +36,7 @@ async def run_model(callback: CallbackQuery, state: FSMContext, user: dbm.User):
     )
     current_state = await state.get_state()
     if current_state == MediaProcessing.running_model:
-        user.update(num_of_requests=user.num_of_requests+1)
+        user.update(num_of_requests=user.num_of_requests + 1)
         await send_result(callback.message, user, user.result_folder)
         await get_menu(callback.message)
     await callback.message.delete()
@@ -122,4 +121,3 @@ async def get_last_media(callback: CallbackQuery, user: dbm.User):
     await callback.message.delete()
     await get_menu(callback.message)
     await callback.answer()
-

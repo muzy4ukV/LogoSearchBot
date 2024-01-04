@@ -37,7 +37,7 @@ async def no_reply(message: Message):
 async def warning(message: Message):
     await message.reply(
         text="To run any command you need to stop sending media\n"
-             "To do this send /cancel command"
+             "To do this click on 'Stop sending media' button or send /cancel command"
     )
 
 

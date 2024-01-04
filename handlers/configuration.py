@@ -54,8 +54,7 @@ async def sens_chosen(message: Message, state: FSMContext, user: dbm.User):
             await message.answer(md.bold("The sensitive level was changed!"))
             await state.clear()
             await get_menu(message)
-    except ValueError as e:
-        logging.warning(e)
+    except ValueError:
         await message.answer(
             text="Wrong number input\. Value must be in d\.dd format"
         )

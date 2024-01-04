@@ -6,6 +6,6 @@ __pycache__/
 *.pyo
 *.pyd
 users
-*.sql
 yolov5
-weights
+qodana.yaml
+change_label.py

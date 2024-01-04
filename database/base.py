@@ -3,7 +3,7 @@ from contextlib import contextmanager
 import sqlalchemy as sa
 from sqlalchemy import select, text, update
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import DeclarativeBase, joinedload
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm.session import Session
 
 from typing import Annotated

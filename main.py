@@ -20,6 +20,10 @@ async def on_startup(bot: Bot):
         BotCommand(
             command='cancel',
             description='Cancel current action'
+        ),
+        BotCommand(
+            command='delete_profile',
+            description="Delete user's profile"
         )
     ]
 
@@ -48,5 +52,7 @@ async def main():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     logging.warning("LogoSearchBot")
-
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass

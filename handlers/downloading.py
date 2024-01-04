@@ -3,6 +3,8 @@ from typing import List, Dict
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, Downloadable
+from sqlalchemy.orm import Mapped
+
 import markdown as md
 import os
 import asyncio
@@ -10,16 +12,10 @@ import asyncio
 from database import models as dbm
 from states import MediaProcessing
 from keyboards.keyboards import get_stop_keyboard
-from .start import get_menu
+from .start import get_menu, clear_folder
+from settings import settings
 
-users_data: Dict[int, List[Message]] = {}
-
-
-def clear_folder(path: str):
-    for file_name in os.listdir(path):
-        file_path = os.path.join(path, file_name)
-        if os.path.isfile(file_path):
-            os.remove(file_path)
+users_data: Dict[Mapped[int], List[Message]] = {}
 
 
 async def start_downloading(callback: CallbackQuery, state: FSMContext, user: dbm.User):
@@ -42,7 +38,7 @@ async def start_downloading(callback: CallbackQuery, state: FSMContext, user: db
 async def check_max_num(path: str, message: Message):
     num = len(os.listdir(path))
     if num >= 5:
-        await message.answer(
+        await message.reply(
             text="You've already downloaded max number of media"
         )
         return True
@@ -63,8 +59,24 @@ async def get_photo(message: Message, bot: Bot, user: dbm.User, show_cancel: boo
 
 async def get_document(message: Message, bot: Bot, user: dbm.User, show_cancel: bool = True):
     if not await check_max_num(user.data_folder, message):
+        if not message.document.file_name:
+            await message.reply(
+                text=f"You sent media of unknown format, use only {md.bold('.jpg .png .mp4 .mov')} formats"
+            )
         file_type = message.document.file_name.split('.')[1].lower()
-        if file_type in ('jpg', 'png', 'mp4', 'mov'):
+        if file_type not in ('jpg', 'png', 'mp4', 'mov'):
+            await message.reply(
+                text=md.text(
+                    "You sent incorrect media type ❗️",
+                    md.text("Send media only in", md.bold(".jpg .png .mp4 .mov"), "format"),
+                    sep="\n"
+                )
+            )
+        elif message.document.file_size > settings.MAX_MEDIA_SIZE_BYTES:
+            await message.reply(
+                text="Media size must be less than 15mb\!"
+            )
+        else:
             await download_media(
                 bot,
                 message.document,
@@ -72,24 +84,24 @@ async def get_document(message: Message, bot: Bot, user: dbm.User, show_cancel: 
             )
             if show_cancel:
                 await show_stop_message(message, user)
-        else:
-            await message.answer(
-                text=md.text(
-                    "You sent incorrect media type ❗️",
-                    md.text("Send media only in", md.bold(".jpg .png .mp4 .mov"), "format"),
-                    sep="\n"
-                )
-            )
 
 
 async def get_video(message: Message, bot: Bot, user: dbm.User, show_cancel: bool = True):
     if not await check_max_num(user.data_folder, message):
+        file_type = message.video.file_name.split('.')[1].lower()
         if message.video.duration > 15:
-            await message.answer(
+            await message.reply(
                 text="Video is too long\! Your video must be less than 15 sec long"
             )
+        elif file_type not in ('mp4', 'mov'):
+            await message.reply(
+                text=md.text(
+                    "You sent incorrect media type ❗️",
+                    md.text("Send media only in", md.bold(".jpg .png .mp4 .mov"), "formats"),
+                    sep="\n"
+                )
+            )
         else:
-            file_type = message.video.file_name.split('.')[1].lower()
             await download_media(
                 bot,
                 message.video,
@@ -128,30 +140,31 @@ async def show_stop_message(message: Message, user: dbm.User):
         text=md.text("Downloaded", md.bold(f"{num_of_media} from 5"), "photos"),
         reply_markup=get_stop_keyboard()
     )
-    if user.user_id in users_data:
-        users_data[user.user_id].append(stop_message)
+    if user.hash_id in users_data:
+        users_data[user.hash_id].append(stop_message)
     else:
-        users_data[user.user_id] = [stop_message]
+        users_data[user.hash_id] = [stop_message]
 
 
-async def stop_downloading(callback: CallbackQuery, state: FSMContext):
+async def stop_downloading(callback: CallbackQuery, state: FSMContext, user: dbm.User):
     await state.clear()
     await callback.message.answer(
         text="Sending photos stopped 🛑"
     )
-    for stop_message in users_data[callback.from_user.id]:
-        await stop_message.delete()
-    users_data[callback.from_user.id].clear()
+    if user.hash_id in users_data:
+        for stop_message in users_data[user.hash_id]:
+            await stop_message.delete()
+        users_data[user.hash_id].clear()
     await get_menu(callback.message)
 
 
-async def cancel_downloading(message: Message, state: FSMContext):
+async def cancel_downloading(message: Message, state: FSMContext, user: dbm.User):
     await state.clear()
     await message.answer(
         text="Sending photos stopped 🛑"
     )
-    if message.from_user.id in users_data:
-        for stop_message in users_data[message.from_user.id]:
+    if user.hash_id in users_data:
+        for stop_message in users_data[user.hash_id]:
             await stop_message.delete()
-        users_data[message.from_user.id].clear()
+        users_data[user.hash_id].clear()
     await get_menu(message)

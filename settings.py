@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DB_NAME: str
     WAIT_TIME_SETTINGS: int
     NUM_OF_REQUESTS_TO_HIDE_MSG: int
+    MAX_MEDIA_SIZE_BYTES: int
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
 

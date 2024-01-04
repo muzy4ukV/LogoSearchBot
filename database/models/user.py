@@ -9,7 +9,8 @@ from sqlalchemy.orm import mapped_column
 class User(Base):
     __tablename__ = 'users'
 
-    user_id: Mapped[int64] = mapped_column(primary_key=True)
+    hash_id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int64] = mapped_column(unique=True)
     username: Mapped[Optional[str_40]] = mapped_column(unique=True)
     sens_level: Mapped[float] = mapped_column(default=0.5)
     data_folder: Mapped[str]
