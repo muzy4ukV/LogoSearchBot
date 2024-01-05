@@ -50,7 +50,6 @@ async def run_model(callback: CallbackQuery, state: FSMContext, user: dbm.User):
         await get_menu(callback.message)
 
 
-
 async def send_result(message: Message, user: dbm.User, destination_folder: str):
     media_list: list[str] = os.listdir(destination_folder)
     if len(media_list) > 1:
