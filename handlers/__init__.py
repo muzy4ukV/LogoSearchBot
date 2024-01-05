@@ -12,7 +12,7 @@ from .downloading import (get_photo, get_video, get_document,
 from .result import run_model, get_last_media
 from .canceling import (cmd_cancel, cancel_no_state, cancel_sens_chosen, no_reply, warning, warning_cl)
 from .configuration import (sens_chosen, warning_sens, start_configuration, start_sensitivity,
-                            show_labels_info, change_labels, warning_sens_cl)
+                            show_labels_info, change_labels, warning_sens_cl, go_back_to_menu)
 
 from callbacks_data import ShowLabelData
 from middlewares.albums_collector import AlbumsMiddleware
@@ -43,6 +43,7 @@ default_router.callback_query.register(warning_cl, MediaProcessing.sending_media
 default_router.callback_query.register(run_model, default_state, F.data == "run")
 default_router.callback_query.register(start_configuration, default_state, F.data == "configure")
 default_router.callback_query.register(start_sensitivity, default_state, F.data == "sensitivity")
+default_router.callback_query.register(go_back_to_menu, default_state, F.data == "go_back")
 
 default_router.message.register(cancel_sens_chosen, ChangeSens.changing_sens, Command('cancel'))
 default_router.message.register(sens_chosen, ChangeSens.changing_sens, F.text)

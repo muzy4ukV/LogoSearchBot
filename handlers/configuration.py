@@ -20,6 +20,13 @@ async def start_configuration(callback: CallbackQuery):
     await callback.answer()
 
 
+async def go_back_to_menu(callback: CallbackQuery):
+    await callback.message.edit_text(
+        text="This is main menu\. Choose what you want to do:",
+        reply_markup=get_main_keyboard()
+    )
+
+
 async def start_sensitivity(callback: CallbackQuery, state: FSMContext, user: dbm.User):
     await callback.message.edit_text(
         text=md.text(

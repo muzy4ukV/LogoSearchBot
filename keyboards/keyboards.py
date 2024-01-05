@@ -45,6 +45,11 @@ def get_conf_keyboard() -> InlineKeyboardMarkup:
         text="Show labels on photo",
         callback_data=ShowLabelData(action="show_info")
     )
+    builder.button(
+        text="Go back to main menu ⬅️",
+        callback_data="go_back"
+    )
+    builder.adjust(2)
     return builder.as_markup(resize_keyboard=True)
 
 
@@ -57,6 +62,10 @@ def get_show_labels_keyboard() -> InlineKeyboardMarkup:
     builder.button(
         text="Hide labels ❌",
         callback_data=ShowLabelData(action="change", value=False)
+    )
+    builder.button(
+        text="Go back to main menu ⬅️",
+        callback_data="go_back"
     )
     builder.adjust(2)
     return builder.as_markup(resize_keyboard=True)
